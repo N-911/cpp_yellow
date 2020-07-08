@@ -24,10 +24,21 @@ public:
     const TasksInfo& GetPersonTasksInfo(const string& person) const {
         return task_base.at(person);
     }
+
+    int get_number_tasks(const string& person) {
+        int res = 0;
+
+        for (const auto [key, value] : task_base.at(person)) {
+            res += value;
+        }
+        return res;
+    }
+
     // Добавить новую задачу (в статусе NEW) для конкретного разработчитка
     void AddNewTask(const string& person) {
         ++task_base[person][TaskStatus ::NEW];
     }
+
     // Обновить статусы по данному количеству задач конкретного разработчика,
     // подробности см. ниже
     tuple<TasksInfo, TasksInfo> PerformPersonTasks(
@@ -35,26 +46,29 @@ public:
         TasksInfo untouched_tasks, updated_tasks, temp;
 
         if(task_base.count(person) == 0) {
-            return {updated_tasks, untouched_tasks};
+            return tie(updated_tasks, untouched_tasks);
         }
         temp = GetPersonTasksInfo(person);
-
         untouched_tasks = GetPersonTasksInfo(person);
-        for (int i = 0; i < task_count; ++i) {
+        int sum = get_number_tasks(person);
+        if (task_count < sum)
+            sum = task_count;
+        for (int i = 0; i < sum; ++i) {
             if (temp.count(TaskStatus ::NEW) > 0) {
                 --temp[TaskStatus::NEW];
                 ++updated_tasks[TaskStatus::IN_PROGRESS];
-                --untouched_tasks[TaskStatus::NEW];
                 ++temp[TaskStatus::IN_PROGRESS];
+                --untouched_tasks[TaskStatus::NEW];
                 if (temp[TaskStatus::NEW] == 0) {
                     temp.erase(TaskStatus ::NEW);
                     untouched_tasks.erase(TaskStatus::NEW);
                 }
             }
-            else if (temp.count(TaskStatus ::IN_PROGRESS) > 0) {
+            else if (temp.count(TaskStatus ::IN_PROGRESS) > 0 ) {
                 --temp[TaskStatus ::IN_PROGRESS];
                 ++temp[TaskStatus ::TESTING];
                 ++updated_tasks[TaskStatus::TESTING];
+//                untouched_tasks[TaskStatus::IN_PROGRESS]= temp[TaskStatus::IN_PROGRESS];
                 --untouched_tasks[TaskStatus::IN_PROGRESS];
                 if (temp[TaskStatus::IN_PROGRESS] == 0) {
                     temp.erase(TaskStatus ::IN_PROGRESS);
@@ -65,6 +79,7 @@ public:
                 --temp[TaskStatus ::TESTING];
                 ++temp[TaskStatus ::DONE];
                 ++updated_tasks[TaskStatus::DONE];
+//                untouched_tasks[TaskStatus::TESTING]= temp[TaskStatus::TESTING];
                 --untouched_tasks[TaskStatus::TESTING];
                 if (temp[TaskStatus::TESTING] == 0) {
                     temp.erase(TaskStatus ::TESTING);
@@ -73,18 +88,18 @@ public:
             }
             else if (temp.count(TaskStatus ::DONE) > 0) {
                 --temp[TaskStatus ::DONE];
-                --untouched_tasks[TaskStatus::DONE];
+//                untouched_tasks[TaskStatus::DONE]= temp[TaskStatus::DONE];
                 if (temp[TaskStatus::DONE] == 0) {
                     temp.erase(TaskStatus ::DONE);
                     untouched_tasks.erase(TaskStatus::DONE);
                 }
             }
             else {
-
                 break;
             }
         }
-        task_base.erase(person);
+        untouched_tasks.erase(TaskStatus::DONE);
+//        task_base.erase(person);
         task_base[person]=temp;
         return {updated_tasks, untouched_tasks};
     }
@@ -103,6 +118,7 @@ void PrintTasksInfo(TasksInfo tasks_info) {
          ", " << tasks_info[TaskStatus::DONE] << " tasks are done" << endl;
 }
 
+
 int main() {
     TeamTasks tasks;
     TasksInfo updated_tasks, untouched_tasks;
@@ -116,7 +132,7 @@ int main() {
     for (int i = 0; i < 5; ++i) {
         tasks.AddNewTask("Alice");
     }
-    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Alice", 2);
+    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Alice", 10);
     PrintTasksInfo(tasks.GetPersonTasksInfo("Alice"));
     tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Alice", 4);
     PrintTasksInfo(tasks.GetPersonTasksInfo("Alice"));
@@ -124,50 +140,3 @@ int main() {
     return 0;
 }
 
-
-/*
- *         untouched_tasks = GetPersonTasksInfo(person);
-        for (int i = 0; i < task_count; ++i) {
-            if (task_base[person][TaskStatus ::NEW] > 0) {
-                --task_base[person][TaskStatus::NEW];
-                ++updated_tasks[TaskStatus::IN_PROGRESS];
-                --untouched_tasks[TaskStatus::NEW];
-                ++task_base[person][TaskStatus::IN_PROGRESS];
-                if (task_base[person][TaskStatus::NEW] == 0) {
-                    task_base[person].erase(TaskStatus ::NEW);
-                    untouched_tasks.erase(TaskStatus::NEW);
-                }
-            }
-            else if (task_base[person][TaskStatus ::IN_PROGRESS] > 0) {
-                --task_base[person][TaskStatus ::IN_PROGRESS];
-                ++task_base[person][TaskStatus ::TESTING];
-                ++updated_tasks[TaskStatus::TESTING];
-                --untouched_tasks[TaskStatus::IN_PROGRESS];
-                if (task_base[person][TaskStatus::IN_PROGRESS] == 0) {
-                    task_base[person].erase(TaskStatus ::IN_PROGRESS);
-                    untouched_tasks.erase(TaskStatus::IN_PROGRESS);
-                }
-            }
-            else if (task_base[person][TaskStatus ::TESTING] > 0) {
-                --task_base[person][TaskStatus ::TESTING];
-                ++task_base[person][TaskStatus ::DONE];
-                ++updated_tasks[TaskStatus::DONE];
-                --untouched_tasks[TaskStatus::TESTING];
-                if (task_base[person][TaskStatus::TESTING] == 0) {
-                    task_base[person].erase(TaskStatus ::TESTING);
-                    untouched_tasks.erase(TaskStatus::TESTING);
-                }
-            }
-            else if (task_base[person][TaskStatus ::DONE] > 0) {
-                --task_base[person][TaskStatus ::DONE];
-                --untouched_tasks[TaskStatus::DONE];
-                if (task_base[person][TaskStatus::DONE] == 0) {
-                    task_base[person].erase(TaskStatus ::DONE);
-                    untouched_tasks.erase(TaskStatus::DONE);
-                }
-            }
-            else {
-                break;
-            }
-        }
- */
