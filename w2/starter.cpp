@@ -50,12 +50,17 @@ istream& operator >> (istream& is, Query& q) {
 }
 
 struct BusesForStopResponse {
-    string stop;
     vector<string> buses;
 };
 
 ostream& operator << (ostream& os, const BusesForStopResponse& r) {
-  // Реализуйте эту функцию
+    if (r.buses.empty()) {
+        cout << "No stop" << endl;
+    } else {
+        for (const string& bus : r.buses) {
+            cout << bus << " ";
+        }
+    }
   return os;
 }
 
@@ -74,12 +79,12 @@ struct AllBusesResponse {
 };
 
 ostream& operator << (ostream& os, const AllBusesResponse& r) {
-    if (r.empty()) {
+    if (r.all_route.empty()) {
         os << "No buses" << endl;
     } else {
-        for (const auto& bus_item : r) {
-            os << "Bus " << r.first << ": ";
-            for (const string& stop : r.second) {
+        for (const auto& bus_item : r.all_route) {
+            os << "Bus " << bus_item.first << ": ";
+            for (const string& stop : bus_item.second) {
                 os << stop << " ";
             }
             os << endl;
@@ -99,19 +104,27 @@ public:
 
   BusesForStopResponse GetBusesForStop(const string& stop) const {
       BusesForStopResponse res;
-      res.stop = stop;
-      res.buses = buses_to_stops[stop];
+        if(stops_to_buses.count(stop) == 0) {
+            return res;
+        }
+        else {
+            for (const string& bus : stops_to_buses.at(stop)) {
+              res.buses.push_back(bus);
+            }
+        }
     return res;
   }
 
   StopsForBusResponse GetStopsForBus(const string& bus) const {
       StopsForBusResponse res;
       res.bus = bus;
-      res.stops.at(stops_to_buses[bus]);
+      res.stops.at(stops_to_buses.at(bus));
       return res;
   }
 
   AllBusesResponse GetAllBuses() const {
+//      map<string, vector<string>> res = buses_to_stops.at();
+//      return res;
       return buses_to_stops;
   }
 
