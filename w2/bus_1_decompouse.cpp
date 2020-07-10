@@ -3,6 +3,7 @@
 #include <cassert>
 #include <vector>
 #include <map>
+#include <tuple>
 
 using namespace std;
 
@@ -28,11 +29,11 @@ istream& operator >> (istream& is, Query& q) {
         q.type = QueryType::NewBus;
         int s_count;
         is >> q.bus >> s_count;
-        vector<string> stops;
-        for (int i = 0; i < s_count; ++i) {
-            string stop;
+        q.stops.resize(s_count);
+//        vector<string>& stops = q.stops;
+//        stops.resize(s_count);
+        for (auto& stop : q.stops) {
             is >> stop;
-            q.stops.push_back(stop);
         }
     } else if (operation_code == "BUSES_FOR_STOP") {
         q.type = QueryType::BusesForStop;
@@ -41,7 +42,6 @@ istream& operator >> (istream& is, Query& q) {
     else if (operation_code == "STOPS_FOR_BUS") {
         q.type = QueryType::StopsForBus;
         is >> q.bus;
-
     }
     else if (operation_code == "ALL_BUSES") {
         q.type = QueryType::AllBuses;
@@ -55,23 +55,44 @@ struct BusesForStopResponse {
 
 ostream& operator << (ostream& os, const BusesForStopResponse& r) {
     if (r.buses.empty()) {
-        cout << "No stop" << endl;
+        os << "No stop";
     } else {
         for (const string& bus : r.buses) {
-            cout << bus << " ";
+            os << bus << " ";
         }
     }
   return os;
 }
 
 struct StopsForBusResponse {
-    string bus;
-    vector<string> stops;
+    string current_bus;
+    vector<pair<string, vector<string>>> v_stops;  // pair (bus, vector->stops)
 };
 
 ostream& operator << (ostream& os, const StopsForBusResponse& r) {
-  // Реализуйте эту функцию
-  return os;
+    if (r.v_stops.empty()) {
+        os << "No bus";
+        return os;
+    }
+    int count = r.v_stops.size();
+    int i = 0;
+    for (auto[stop, buses] : r.v_stops) {
+        os << "Stop " << stop << ":";
+        for (auto& bus : buses) {
+            if (buses.size() == 1) {
+                cout << " no interchange";
+            } else {
+                if (bus != r.current_bus) {
+                    os << " " << bus;
+                }
+            }
+        }
+        ++i;
+        if (i < count) {
+            os << endl;
+        }
+    }
+    return os;
 }
 
 struct AllBusesResponse {
@@ -80,14 +101,19 @@ struct AllBusesResponse {
 
 ostream& operator << (ostream& os, const AllBusesResponse& r) {
     if (r.all_route.empty()) {
-        os << "No buses" << endl;
+        os << "No buses";
     } else {
+        int count = r.all_route.size();
+        int i = 0;
         for (const auto& bus_item : r.all_route) {
-            os << "Bus " << bus_item.first << ": ";
+            os << "Bus " << bus_item.first << ":";
             for (const string& stop : bus_item.second) {
-                os << stop << " ";
+                os << " " << stop;
             }
-            os << endl;
+            ++i;
+            if (i < count) {
+                os << endl;
+            }
         }
     }
   return os;
@@ -96,14 +122,14 @@ ostream& operator << (ostream& os, const AllBusesResponse& r) {
 class BusManager {
 public:
   void AddBus(const string& bus, const vector<string>& stops) {
-      stops_to_buses[bus] = stops;
+      buses_to_stops[bus] = stops;
       for (auto& stop : stops) {
-          buses_to_stops[stop].push_back(bus);
+          stops_to_buses[stop].push_back(bus);
       }
   }
 
   BusesForStopResponse GetBusesForStop(const string& stop) const {
-      BusesForStopResponse res;
+      BusesForStopResponse res;  // vector buses
         if(stops_to_buses.count(stop) == 0) {
             return res;
         }
@@ -117,15 +143,26 @@ public:
 
   StopsForBusResponse GetStopsForBus(const string& bus) const {
       StopsForBusResponse res;
-      res.bus = bus;
-      res.stops.at(stops_to_buses.at(bus));
+
+      res.current_bus = bus;
+      if (buses_to_stops.count(bus) == 0) {
+          return res;
+      }
+      else {
+          vector<string> stops = buses_to_stops.at(bus);
+          for (auto& stop : stops) {
+              BusesForStopResponse v_buses = GetBusesForStop(stop);
+              res.v_stops.push_back({stop, v_buses.buses});
+          }
+      }
       return res;
   }
 
   AllBusesResponse GetAllBuses() const {
-//      map<string, vector<string>> res = buses_to_stops.at();
-//      return res;
-      return buses_to_stops;
+      return AllBusesResponse{buses_to_stops};
+//      AllBusesResponse all;
+//      all.all_route = buses_to_stops;
+//      return all;
   }
 
 private:
@@ -136,8 +173,6 @@ private:
    * stops_to_buses  -->  список автобусов для конкретной остановки
    */
 };
-
-// Не меняя тела функции main, реализуйте функции и классы выше
 
 int main() {
   int query_count;
@@ -163,6 +198,5 @@ int main() {
       break;
     }
   }
-
   return 0;
 }
