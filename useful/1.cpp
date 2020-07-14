@@ -1,3 +1,21 @@
+class c_lass
+{
+public:
+  c_lass() = default; //!!!!
+
+  ~c_lass();
+  
+};
+
+
+
+
+
+int data[] = { 1, 2, 3, 4, 4, 3, 7, 8, 9, 10 };
+std::vector<int> v(data, data+10);
+
+
+
 void TestIsPalindrom() {
   Assert(IsPalindrom(""), "empty string is a palindrome");
   Assert(IsPalindrom("a"), "one letter string is a palindrome");
