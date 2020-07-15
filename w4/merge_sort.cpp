@@ -6,18 +6,14 @@ using namespace std;
 
 template <typename RandomIt>
 void MergeSort(RandomIt range_begin, RandomIt range_end) {
-    if (range_begin - range_end < 2) {
+    if (range_end - range_begin <  2) {
         return;
     }
-
     vector<typename RandomIt::value_type> elements(range_begin, range_end);
     RandomIt it_middle = elements.begin() + elements.size() / 2;
-
     MergeSort(elements.begin(), it_middle);
     MergeSort(it_middle, elements.end());
-    vector<typename RandomIt::value_type> elements2(range_begin, range_end);
-    merge(elements.begin(), it_middle, it_middle, elements.end(), back_inserter(elements2));
-    elements = elements2;
+    merge(elements.begin(), it_middle, it_middle, elements.end(), range_begin);
 }
 
 int main() {
