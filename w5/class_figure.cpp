@@ -4,41 +4,44 @@
 #include <memory>
 #include <sstream>
 #include <cmath>
+#include <istream>
+#include <vector>
 
 using namespace std;
 
 class Figure {
 public:
-//    Figure(const string& _name) : name(_name) {}
+    Figure(const string& _name) : type(_name) {}
 
     virtual string Name() const = 0;
     virtual float Perimeter() const = 0;
-    virtual float Area() const = 0;
+    virtual long double Area() const = 0;
 
+    virtual ~Figure() = default;
+    const string type;
 };
 
 class Triangle : public Figure {
 public:
-    Triangle(int a, int b, int c) : side_a(a), 
+    Triangle(int& a, int& b, int& c) : Figure("TRIANGLE"), side_a(a),
                                     side_b(b), 
-                                    side_c(c), 
-                                    name("TRIANGLE")  {}
+                                    side_c(c)
+                                    {}
 
-    string Name() {
-        return name;
+    string Name() const override{
+        return type;
     }
 
     float Perimeter() const override {
-        return float(side_a) + side_b + side_c;
+        return (float(side_a) + side_b + side_c);
     }
 
-    float Area() const override {
-        int p = (side_a + side_b + side_c) / 2;
-        return sqrt(p * ( p - a) * (p - b) * (p - c));
+    long double Area() const override {
+        float p = (side_a + side_b + side_c) / 2.0;
+        return (sqrt(p * (p - side_a) * (p - side_b) * (p - side_c)));
     }
 
 private:
-    const string name;
     const int side_a;
     const int side_b;
     const int side_c;
@@ -46,55 +49,72 @@ private:
 
 class Rect : public Figure {
 public:
-    Rect(int w, int h) : width(w), height(h), name("RECT")  {
+    Rect(int& w, int& h) : Figure("RECT"), width(w), height(h) {
     }
 
-    string Name() {
-        return name;
+    string Name() const override {
+        return type;
     }
 
     float Perimeter() const override {
         return float(width) * 2 + height * 2;
     }
 
-    float Area() const override {
+    long double Area() const override {
         return float(width) * height;
     }
 
 private:
-    const string name;
     const int width;
     const int height;
 };
 
 class Circle : public Figure {
 public:
-    Circle(int _radius) : radius(_radius), name("CIRCLE") {}
+    Circle(int& _radius) : Figure("CIRCLE"), radius(_radius) {}
 
+    string Name() const override {
+        return type;
+    }
 
     float Perimeter() const override {
         return (float(radius) * 2 * 3.14);
     }
 
-    float Area() const override {
+    long double Area() const override {
         return (float(radius) * radius * 3.14);
     }
 
 private:
-    string name;
     int radius;
-
-
 };
 
 shared_ptr<Figure> CreateFigure(istream& is) {
     shared_ptr<Figure> res;
+    string name;
 
+    is >> name;
+    if (name == "RECT") {
+        int w,h;
+        is >> w >> h;
+        res = make_shared<Rect>(w, h);
+        return res;
+    }
+    if (name == "TRIANGLE") {
+        int a, b, c;
 
+        is >> a >> b >>c;
+        res = (make_shared<Triangle>(a, b, c));
+        return res;
+    }
+    if (name == "CIRCLE") {
+        int r;
 
-
-
-    return res;
+        is >> r;
+        res = (make_shared<Circle>(r));
+        return res;
+    }
+    throw std::invalid_argument("invalid figure name was specified");
 }
 
 int main() {
