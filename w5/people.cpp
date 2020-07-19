@@ -16,7 +16,7 @@ public:
                                                        Profesional(_prof) {}
 
     virtual void Walk(const string& destination) const {
-        cout << get_Prof() << ": " << get_Name() << " walks to: " << destination << endl;
+        cout << Prof_and_Name() << " walks to: " << destination << endl;
     }
 
     const string &get_Name() const
@@ -30,7 +30,7 @@ public:
     }
 
     const string Prof_and_Name() const {
-        return get_Prof() + ": " + get_Name();
+        return Profesional + ": " + Name;
     }
 
 private:
