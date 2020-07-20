@@ -10,16 +10,21 @@
 class Database {
 public:
 
-void AddEvent(const Date& date, const string& event);
 
-bool DeleteEvent(const Date& date, const string& event);
+void Add(const Date& date, const string& event);
 
-int DeleteDate(const Date& date);
+cout  ? Date Last(Date) const;
 
-set<string> Find(const Date& date) const;
+int RemoveIf(predicate) const;
 
-void Print() const;
+set<string> FindIf(predicate) const;
+
+
+void Print(ostream& stream_out) const;
 
 private:
+
 map<Date, set<string>> storage;
-};
+
+// vector<Date> storage   ??  or pair (2017-11-07, big sport event).
+ };

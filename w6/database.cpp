@@ -5,6 +5,13 @@ void Database :: AddEvent(const Date& date, const string& event) {
     storage[date].insert(event);
 }
 
+int Database :: RemoveIf(const Date& date, const string& event) {
+
+}
+
+
+
+/*
 bool Database :: DeleteEvent(const Date& date, const string& event) {
     if (storage.count(date) > 0 && storage[date].count(event) > 0) {
         storage[date].erase(event);
@@ -39,3 +46,4 @@ void Database :: Print() const {
     }
 }
 
+*/

@@ -10,7 +10,10 @@
 using namespace std;
 
 string ParseEvent(istream& is) {
-  // Реализуйте эту функцию
+  string event;
+
+  getline(is, event);
+  return event;
 }
 
 void TestAll();
@@ -25,22 +28,29 @@ int main() {
 
     string command;
     is >> command;
-    if (command == "Add") {
+    if (command == "Add") {  // добавить в базу данных пару (date, event);
       const auto date = ParseDate(is);
       const auto event = ParseEvent(is);
       db.Add(date, event);
-    } else if (command == "Print") {
+    } else if (command == "Print") {  // вывести всё содержимое базы данных;
       db.Print(cout);
-    } else if (command == "Del") {
-      auto condition = ParseCondition(is);
-      auto predicate = [condition](const Date& date, const string& event) {
+
+    } else if (command == "Del") {  //  удалить из базы все записи, которые удовлетворяют условию condition;
+      auto condition = ParseCondition(is);   // condition  = shared_ptr<Node> 
+      
+      auto predicate = [condition](const Date& date, const string& event) {  // lambda
         return condition->Evaluate(date, event);
       };
+
       int count = db.RemoveIf(predicate);
       cout << "Removed " << count << " entries" << endl;
-    } else if (command == "Find") {
-      auto condition = ParseCondition(is);
-      auto predicate = [condition](const Date& date, const string& event) {
+
+    } else if (command == "Find") {  // вывести все записи, содержащиеся в базе данных, которые удовлетворяют условию condition;
+
+      // event != "working day"
+      auto condition = ParseCondition(is);  // shared_ptr<Node>
+
+      auto predicate = [condition](const Date& date, const string& event) {   // lambda  
         return condition->Evaluate(date, event);
       };
 
@@ -49,7 +59,8 @@ int main() {
         cout << entry << endl;
       }
       cout << "Found " << entries.size() << " entries" << endl;
-    } else if (command == "Last") {
+
+    } else if (command == "Last") {  //  вывести запись с последним событием, случившимся не позже данной даты.
       try {
           cout << db.Last(ParseDate(is)) << endl;
       } catch (invalid_argument&) {

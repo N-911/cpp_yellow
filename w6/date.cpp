@@ -4,6 +4,10 @@
 using namespace std;
 
 Date :: Date(int new_year, int new_month, int new_day) {
+
+    if (new_year > 9999 || new_year < 0) {
+       throw logic_error("Year value is invalid: " + to_string(new_year));
+    }
     year = new_year;
     if (new_month > 12 || new_month < 1) {
         throw logic_error("Month value is invalid: " + to_string(new_month));
@@ -81,3 +85,5 @@ Date ParseDate(istream& is) {
     }
     return Date(y, m, d);
 }
+
+
