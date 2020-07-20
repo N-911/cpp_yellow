@@ -7,11 +7,11 @@ using namespace std;
 enum class TokenType {
   DATE,
   EVENT,
-  COLUMN,
-  LOGICAL_OP,
-  COMPARE_OP,
-  PAREN_LEFT,
-  PAREN_RIGHT,
+  COLUMN,       //
+  LOGICAL_OP,  // AND, OR   " set - + "
+  COMPARE_OP,  // ==, !=, < , > , <=, >=
+  PAREN_LEFT,  // (
+  PAREN_RIGHT,  // )
 };
 
 struct Token {

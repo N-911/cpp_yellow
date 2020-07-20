@@ -12,13 +12,15 @@ using namespace std;
 class Node {
 public :
 
-    virtual int Evaluate() const = 0;
+    virtual int Evaluate() const {
+        return 0;
+}
 };
 
 
 class EmptyNode : Node {
 public:
-    int Evaluate() const override;
+    int Evaluate(const Date& date, const string& event) const override;
 };
 
 
@@ -30,21 +32,33 @@ public:
         op = _op;
     }
     
-    Evaluate(const Date& date, const string& event) override {
-
+    int Evaluate(const Date& date, const string& event) const override {
+        return 0;
     }
 
-Date date;
-char op;
+private:
+    Date date;
+    char op;
 };
+
 
 class EventComparisonNode : Node {
 public:
+
+    EventComparisonNode() = default;
 
 };
 
 
 class LogicalOperationNode : Node {
 public:
+    LogicalOperationNode() = default;
 
-}
+    int Evaluate(const Date& date, const string& event) const override {
+        return 0;
+    }
+
+    void Or();
+    void And();
+
+};
