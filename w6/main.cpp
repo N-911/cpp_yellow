@@ -54,9 +54,9 @@ int main() {
         return condition->Evaluate(date, event);
       };
 
-      const auto entries = db.FindIf(predicate);
+      const auto entries = db.FindIf(predicate);   // entries - контейнер пар Date-event
       for (const auto& entry : entries) {
-        cout << entry << endl;
+        cout << entry << endl;  // entry ? pair<Date, event>
       }
       cout << "Found " << entries.size() << " entries" << endl;
 

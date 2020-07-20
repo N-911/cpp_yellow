@@ -1,5 +1,6 @@
 #pragma once
 
+#include "date.h"
 using namespace std;
 
 /*
@@ -12,13 +13,13 @@ class Node {
 public :
 
     virtual int Evaluate() const = 0;
-}
+};
 
 
 class EmptyNode : Node {
 public:
     int Evaluate() const override;
-}
+};
 
 
 class DateComparisonNode : Node {
@@ -29,18 +30,18 @@ public:
         op = _op;
     }
     
-    Evaluate(const Date& date, const string& event) {
+    Evaluate(const Date& date, const string& event) override {
 
     }
 
 Date date;
-chat op;
-}
+char op;
+};
 
 class EventComparisonNode : Node {
 public:
 
-}
+};
 
 
 class LogicalOperationNode : Node {

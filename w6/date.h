@@ -23,4 +23,6 @@ private:
     int day;
 };
 
+ostream& operator<<(ostream& stream, const Date& date);
+
 Date ParseDate(istream& is);
