@@ -50,13 +50,13 @@ int main() {
       // event != "working day"
       auto condition = ParseCondition(is);  // shared_ptr<Node>
 
-      auto predicate = [condition](const Date& date, const string& event) {   // lambda  
+      auto predicate = [condition](const Date& date, const string& event) {   // lambda
         return condition->Evaluate(date, event);
       };
 
       const auto entries = db.FindIf(predicate);   // entries - контейнер пар Date-event
       for (const auto& entry : entries) {
-        cout << entry << endl;  // entry ? pair<Date, event>
+        cout << entry << endl;  // entry ? pair<Date, event> string "Date + event"
       }
       cout << "Found " << entries.size() << " entries" << endl;
 

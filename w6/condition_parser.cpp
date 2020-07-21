@@ -21,7 +21,8 @@ template <class It> shared_ptr<Node> ParseComparison(It& current, It end) {
     throw logic_error("Expected comparison operation");
   }
 
-  Token& op = *current;
+  Token& op = *current;  // operator compare elements
+
   if (op.type != TokenType::COMPARE_OP) {
     throw logic_error("Expected comparison operation");
   }
@@ -61,6 +62,7 @@ template <class It> shared_ptr<Node> ParseComparison(It& current, It end) {
 
 template <class It>
 shared_ptr<Node> ParseExpression(It& current, It end, unsigned precedence) {
+    //  итератор на первый элемент vector<Token>,  tokens.end(), приоритет 0
   if (current == end) {
     return shared_ptr<Node>();
   }
@@ -96,8 +98,7 @@ shared_ptr<Node> ParseExpression(It& current, It end, unsigned precedence) {
 
     ++current; // consume op
 
-    left = make_shared<LogicalOperationNode>(
-        logical_operation, left, ParseExpression(current, end, current_precedence)
+    left = make_shared<LogicalOperationNode>(logical_operation, left, ParseExpression(current, end, current_precedence)
     );
   }
 
@@ -105,8 +106,8 @@ shared_ptr<Node> ParseExpression(It& current, It end, unsigned precedence) {
 }
 
 shared_ptr<Node> ParseCondition(istream& is) {
-  auto tokens = Tokenize(is);
-  auto current = tokens.begin();
+  auto tokens = Tokenize(is);  // type vector<Token>
+  auto current = tokens.begin();   // итератор на первый элемент vector<Token>
   auto top_node = ParseExpression(current, tokens.end(), 0u);
 
   if (!top_node) {

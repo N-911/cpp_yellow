@@ -1,64 +1,70 @@
 #pragma once
 
 #include "date.h"
+#include "condition_parser.h"
+
 using namespace std;
 
 /*
-классы Node, EmptyNode, DateComparisonNode, EventComparisonNode и LogicalOperationNode — сформировать их иерархию 
+классы Node, EmptyNode, DateComparisonNode, EventComparisonNode и LogicalOperationNode — сформировать их иерархию
 и публичный интерфейс вам поможет анализ функций main и ParseCondition;
 
 */
 
 class Node {
 public :
+    Node(const string& s_type);
 
-    virtual int Evaluate() const {
-        return 0;
-}
+    virtual int Evaluate() const;
+
+    const string type;
 };
 
 
-class EmptyNode : Node {
+class EmptyNode : public Node {
 public:
-    int Evaluate(const Date& date, const string& event) const override;
+
+    EmptyNode();
+
+    int Evaluate(const Date& date, const string& event) const;
+
 };
 
 
-class DateComparisonNode : Node {
+class DateComparisonNode : public Node {
 public:
 
-    DateComparisonNode(const Date& _date, char _op) {
-        date = _date;
-        op = _op;
-    }
-    
-    int Evaluate(const Date& date, const string& event) const override {
-        return 0;
-    }
+    DateComparisonNode(const Comparison& _cmp, const Date &_date);
+
+    int Evaluate(const Date& date, const string& event) const;
 
 private:
     Date date;
-    char op;
+    Comparison cmp;
 };
 
 
-class EventComparisonNode : Node {
+class EventComparisonNode : public Node {
 public:
 
-    EventComparisonNode() = default;
+    EventComparisonNode(const Comparison& cmp, const string& _event);   // Comparison, event
+    int Evaluate(const Date& date, const string& event) const;
 
+private:
+    string event;
+    Comparison cmp;
 };
 
 
-class LogicalOperationNode : Node {
+class LogicalOperationNode : public Node {
+
 public:
-    LogicalOperationNode() = default;
+    LogicalOperationNode(const LogicalOperation& _lop, const shared_ptr<Node>& _left, const shared_ptr<Node>& _right);
+    int Evaluate(const Date& date, const string& event) const;
 
-    int Evaluate(const Date& date, const string& event) const override {
-        return 0;
-    }
 
-    void Or();
-    void And();
-
+private:
+    LogicalOperation lop;
+    shared_ptr<Node> left;
+    shared_ptr<Node> right;
 };

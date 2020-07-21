@@ -2,19 +2,23 @@
 
 
 void Database :: Add(const Date& date, const string& event) {
-    storage[date].push_back(event);
+    if (storage_s.count(date) && (storage_s[date].count(event) == 0)) {
+//        if (find(storage_s[date].begin(), storage_s[date].end(), event) == storage_s[date].end()) {
+        storage_v[date].push_back(event);
+        storage_s[date].insert(event);
+    }
 }
 
 
 string Database:: Last(const Date& date) const {
 
-    auto it = find(begin(storage), end(storage), date);
+    auto it = find(begin(storage_v), end(storage_v), date);
 
-    if (it == end(storage)) {
+    if (it == end(storage_v)) {
         throw invalid_argument("no date");
     }
     cout << (*it).first ;
-    return (*it).second.back();
+    return (*it).second;
 }
 
 

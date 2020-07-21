@@ -3,6 +3,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <vector>
 #include <iostream>
 #include "date.h"
 #include <stdexcept>
@@ -30,7 +31,8 @@ public:
 
 private:
 
-map<Date, vector<string>> storage;
+map<Date, vector<string>> storage_v;
+map<Date, set<string>> storage_s;
 
 //set<Date, vector<string>> storage_2; // emplace
 
