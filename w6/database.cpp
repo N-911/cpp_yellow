@@ -9,7 +9,6 @@ void Database :: Add(const Date& date, const string& event) {
     }
 }
 
-
 string Database:: Last(const Date& date) const {
 
     auto it = find(begin(storage_v), end(storage_v), date);
@@ -18,12 +17,12 @@ string Database:: Last(const Date& date) const {
         throw invalid_argument("no date");
     }
     cout << (*it).first ;
-    return (*it).second;
+    return (*it).second.back();
 }
 
 
 ostream& Database :: Print(ostream& stream) const {
-    for (const auto& [key, value] : storage) {
+    for (const auto& [key, value] : storage_v) {
         for (const string& event : value) {
             stream << key << event << endl;
         }
