@@ -10,6 +10,7 @@
 
 using namespace std;
 
+
 class Database {
 public:
     Database() = default;
@@ -20,20 +21,16 @@ public:
 
     ostream& Print(ostream& stream) const;
 
-//    int RemoveIf(predicate);
-
+//    template <typename Predicate>
+//    int RemoveIf(Predicate predicate);
+    int RemoveIf(function<bool(const Date& date, const string& event)> predicate);
     // stable_partition
 
-//set<string> FindIf(predicate) const;
-
+    set<string> FindIf(function<bool(const Date& date, const string& event)> predicate);
 
 
 private:
-
-map<Date, vector<string>> storage_v;
-map<Date, set<string>> storage_s;
-
-//set<Date, vector<string>> storage_2; // emplace
-// vector<Date> storage   ??  or pair (2017-11-07, big sport event).
+    map<Date, vector<string>> storage_v;
+    map<Date, set<string>> storage_s;
 
 };

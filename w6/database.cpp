@@ -10,15 +10,41 @@ void Database :: Add(const Date& date, const string& event) {
 }
 
 string Database:: Last(const Date& date) const {
+    auto it = storage_v.upper_bound(date);
 
-    auto it = find(begin(storage_v), end(storage_v), date);
-
-    if (it == end(storage_v)) {
+    if (it == storage_v.begin()) {
         throw invalid_argument("no date");
     }
-    cout << (*it).first ;
-    return (*it).second.back();
+    cout << (--it)->first ;
+    return (--it)->second.back();
 }
+
+
+
+int Database :: RemoveIf(function<bool(const Date& date, const string& event)> predicate) {
+
+    return 0;
+}
+
+set<string> Database :: FindIf(function<bool(const Date& date, const string& event)> predicate) {
+
+    return {"1", " 2"};
+}
+
+/*
+template <typename Predicate>
+int Database :: RemoveIf(Predicate predicate){
+    return 0;
+}
+
+template <typename Predicate>
+set<string> Database :: FindIf(Predicate predicate) {
+    set<string> res;
+
+    return res;
+}
+
+*/
 
 
 ostream& Database :: Print(ostream& stream) const {
@@ -29,11 +55,6 @@ ostream& Database :: Print(ostream& stream) const {
     }
     return stream;
 }
-
-//int Database :: RemoveIf(const Date& date, const string& event) {
-
-//}
-
 
 
 /*

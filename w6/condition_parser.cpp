@@ -2,11 +2,12 @@
 #include "token.h"
 #include "date.h"
 #include "node.h"
-
 #include <map>
+
 using namespace std;
 
-template <class It> shared_ptr<Node> ParseComparison(It& current, It end) {
+template <class It>
+shared_ptr<Node> ParseComparison(It& current, It end) {
   if (current == end) {
     throw logic_error("Expected column name: date or event");
   }
@@ -62,7 +63,7 @@ template <class It> shared_ptr<Node> ParseComparison(It& current, It end) {
 
 template <class It>
 shared_ptr<Node> ParseExpression(It& current, It end, unsigned precedence) {
-    //  итератор на первый элемент vector<Token>,  tokens.end(), приоритет 0
+    //  итератор на первый элемент vector<Token>,  tokens.end(), приоритет 0  { "< ", " date"}
   if (current == end) {
     return shared_ptr<Node>();
   }

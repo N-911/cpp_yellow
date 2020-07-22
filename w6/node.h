@@ -2,31 +2,37 @@
 
 #include "date.h"
 #include "condition_parser.h"
+#include <memory>
 
 using namespace std;
 
-/*
-классы Node, EmptyNode, DateComparisonNode, EventComparisonNode и LogicalOperationNode — сформировать их иерархию
-и публичный интерфейс вам поможет анализ функций main и ParseCondition;
+enum class Comparison {
+    Less,
+    LessOrEqual,
+    Greater,
+    GreaterOrEqual,
+    Equal,
+    NotEqual,
+};
 
-*/
+enum class LogicalOperation {
+    Or,
+    And
+};
+
 
 class Node {
 public :
-    Node(const string& s_type);
+//    Node() = default;
 
-    virtual int Evaluate() const;
-
-    const string type;
+    virtual bool Evaluate(const Date& date, const string& event) const = 0;
 };
-
 
 class EmptyNode : public Node {
 public:
 
-    EmptyNode();
-
-    int Evaluate(const Date& date, const string& event) const;
+    EmptyNode() = default;
+    bool Evaluate(const Date& date, const string& event) const override;
 
 };
 
@@ -34,13 +40,12 @@ public:
 class DateComparisonNode : public Node {
 public:
 
-    DateComparisonNode(const Comparison& _cmp, const Date &_date);
-
-    int Evaluate(const Date& date, const string& event) const;
+    DateComparisonNode(const Comparison& _cmp, const Date& _date);
+    bool Evaluate(const Date& date, const string& event) const override;
 
 private:
-    Date date;
-    Comparison cmp;
+    Comparison CMP;
+    Date DATE;
 };
 
 
@@ -48,11 +53,11 @@ class EventComparisonNode : public Node {
 public:
 
     EventComparisonNode(const Comparison& cmp, const string& _event);   // Comparison, event
-    int Evaluate(const Date& date, const string& event) const;
+    bool Evaluate(const Date& date, const string& event) const override;
 
 private:
-    string event;
-    Comparison cmp;
+    string EVENT;
+    Comparison CMP;
 };
 
 
@@ -60,7 +65,7 @@ class LogicalOperationNode : public Node {
 
 public:
     LogicalOperationNode(const LogicalOperation& _lop, const shared_ptr<Node>& _left, const shared_ptr<Node>& _right);
-    int Evaluate(const Date& date, const string& event) const;
+    bool Evaluate(const Date& date, const string& event) const override;
 
 
 private:
@@ -68,3 +73,9 @@ private:
     shared_ptr<Node> left;
     shared_ptr<Node> right;
 };
+
+template <typename Compare>
+bool template_compare(const Compare& d_1, const Compare& d_2, Comparison cmp);
+
+
+

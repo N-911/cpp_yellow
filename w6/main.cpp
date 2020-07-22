@@ -36,9 +36,8 @@ int main() {
       db.Print(cout);
 
     } else if (command == "Del") {  //  удалить из базы все записи, которые удовлетворяют условию condition;
-      auto condition = ParseCondition(is);   // condition  = shared_ptr<Node> 
-      
-      auto predicate = [condition](const Date& date, const string& event) {  // lambda
+      auto condition = ParseCondition(is);   // condition  = shared_ptr<Node>  is = "< 2017-11-06"
+      auto predicate = [condition](const Date& date, const string& event) {  // переменная содержит lambda function for compare
         return condition->Evaluate(date, event);
       };
 
@@ -47,14 +46,13 @@ int main() {
 
     } else if (command == "Find") {  // вывести все записи, содержащиеся в базе данных, которые удовлетворяют условию condition;
 
-      // event != "working day"
       auto condition = ParseCondition(is);  // shared_ptr<Node>
 
-      auto predicate = [condition](const Date& date, const string& event) {   // lambda
+      auto predicate = [condition](const Date& date, const string& event) {  // переменная содержит lambda function for compare
         return condition->Evaluate(date, event);
       };
 
-      const auto entries = db.FindIf(predicate);   // entries - контейнер пар Date-event
+      const auto entries = db.FindIf(predicate);  // entries - контейнер пар Date-event
       for (const auto& entry : entries) {
         cout << entry << endl;  // entry ? pair<Date, event> string "Date + event"
       }
