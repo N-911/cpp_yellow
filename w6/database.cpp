@@ -20,10 +20,24 @@ string Database:: Last(const Date& date) const {
 }
 
 
-
 int Database :: RemoveIf(function<bool(const Date& date, const string& event)> predicate) {
 
-    return 0;
+//    auto it_lower_map_v = lower_bound(begin(storage_v), end(storage_v), predicate);
+//    auto it_lower_map_set = lower_bound(begin(storage_v), end(storage_v), predicate);
+
+    int number = 0;
+
+//    for ( ; it_lower_map_v != storage_v.end(); ++it_lower_map_v, ++it_lower_map_set) {
+//        auto it_vector = stable_partition(*it_lower_map_v->second.begin(), *it_lower_map_v->second.end(), predicate);
+//        (*it_lower_map_v).second.erase(it_vector, *it_lower_map_v->second.end());
+//        (*it_lower_map_v->second).erase(it_vector, *it_lower_map_v->second.end());
+
+//        auto it_set = lower_bound(*it_lower_map_set->second.begin(), *it_lower_map_set->second.end(), predicate);
+//        (*it_lower_map_v->second).erase(it_set, *it_lower_map_set->second.end());
+//        ++number;
+//    }
+
+    return number;
 }
 
 set<string> Database :: FindIf(function<bool(const Date& date, const string& event)> predicate) {
@@ -78,10 +92,7 @@ int Database :: DeleteDate(const Date& date) {
 
 set<string> Database :: Find(const Date& date) const {
     if (storage.count(date) > 0) {
-        return storage.at(date);
-    } else {
-    return {};
-    }
-}
-*/
+        return storage.at(d
 
+
+*/

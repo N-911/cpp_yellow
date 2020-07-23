@@ -74,8 +74,8 @@ private:
     shared_ptr<Node> right;
 };
 
-template <typename Compare>
-bool template_compare(const Compare& d_1, const Compare& d_2, Comparison cmp);
+//template <typename Compare>
+//bool template_compare(const Compare& d_1, const Compare& d_2, Comparison cmp);
 
 
 

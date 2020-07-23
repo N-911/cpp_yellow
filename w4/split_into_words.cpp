@@ -4,6 +4,11 @@
 
 using namespace std;
 
+/*
+Напишите функцию SplitIntoWords, разбивающую строку на слова по пробелам.
+*/
+
+
 vector<string> SplitIntoWords(const string& s) {
     vector<string> res;
 
