@@ -1,17 +1,20 @@
+#include <iostream>
+#include <stdexcept>
+#include <vector>
+
 #include "database.h"
 #include "date.h"
 #include "condition_parser.h"
 #include "node.h"
 #include "test_runner.h"
 
-#include <iostream>
-#include <stdexcept>
 
 using namespace std;
 
 string ParseEvent(istream& is) {
   string event;
 
+    is >> ws;
   getline(is, event);
   return event;
 }
@@ -19,7 +22,7 @@ string ParseEvent(istream& is) {
 void TestAll();
 
 int main() {
-  TestAll();
+//  TestAll();
 
   Database db;
 
@@ -73,6 +76,7 @@ int main() {
 
   return 0;
 }
+
 
 void TestParseEvent() {
   {

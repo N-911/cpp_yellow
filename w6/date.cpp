@@ -32,6 +32,11 @@ int Date :: GetDay() const {
 }
 
 
+string Date_to_str(const Date& current_date) {
+    return (to_string(current_date.GetYear()) + "-" + to_string(current_date.GetMonth()) + "-" + to_string(current_date.GetDay()));
+}
+
+
 // даты будут по умолчанию выводиться в нужном формате
 ostream& operator<<(ostream& stream, const Date& date) {
     stream << setw(4) << setfill('0') << date.GetYear() <<
@@ -71,6 +76,7 @@ bool operator!=(const Date& lhs, const Date& rhs) {
            vector<int>{rhs.GetYear(), rhs.GetMonth(), rhs.GetDay()};
 }
 
+
 Date ParseDate(istream& is) {
     int y;
     int m;
@@ -101,10 +107,10 @@ Date ParseDate(istream& is) {
         error = "Wrong date format: " + str_date;
         throw runtime_error(error);
     }
-    if (!(is.peek() == EOF)) {
-        error = "Wrong date format: " + str_date;
-        throw runtime_error(error);
-    }
+//    if (!(is.peek() == EOF)) {
+//        error = "Wrong date format: " + str_date;
+//        throw runtime_error(error);
+//    }
     return Date(y, m, d);
 }
 

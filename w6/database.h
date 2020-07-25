@@ -5,8 +5,12 @@
 #include <map>
 #include <vector>
 #include <iostream>
-#include "date.h"
 #include <stdexcept>
+#include <algorithm>
+#include <utility>
+#include <functional>
+
+#include "date.h"
 
 using namespace std;
 
@@ -19,18 +23,12 @@ public:
 
     string Last(const Date& date) const;
 
-    ostream& Print(ostream& stream) const;
+    void Print(ostream& stream) const;
+    int RemoveIf(function<bool(const Date& date, const string& event)> condition);
 
-//    template <typename Predicate>
-//    int RemoveIf(Predicate predicate);
-    int RemoveIf(function<bool(const Date& date, const string& event)> predicate);
-    // stable_partition
-
-    set<string> FindIf(function<bool(const Date& date, const string& event)> predicate);
-
+    vector<string> FindIf(function<bool(const Date& date, const string& event)>) const;
 
 private:
     map<Date, vector<string>> storage_v;
     map<Date, set<string>> storage_s;
-
 };

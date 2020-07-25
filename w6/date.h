@@ -20,11 +20,17 @@ public:
 
     int GetDay() const;
 
+//    string Date_to_str() const;
+//    operator string () const;
+
 private:
     int year;
     int month;
     int day;
 };
+
+string Date_to_str(const Date& current_date);
+Date ParseDate(istream& is);
 
 ostream& operator<<(ostream& stream, const Date& date);
 bool operator<(const Date& lhs, const Date& rhs);
@@ -32,6 +38,5 @@ bool operator<=(const Date& lhs, const Date& rhs);
 bool operator>(const Date& lhs, const Date& rhs);
 bool operator>=(const Date& lhs, const Date& rhs);
 bool operator==(const Date& lhs, const Date& rhs);
-bool operator!=(const Date& lhs, const Date& rhs);
 
-Date ParseDate(istream& is);
+bool operator!=(const Date& lhs, const Date& rhs);

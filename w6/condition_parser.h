@@ -1,15 +1,15 @@
 #pragma once
 
-#include "node.h"
-#include <iostream>
+#include <map>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <stdexcept>
+#include <istream>
 
+#include "node.h"
 #include "token.h"
 #include "date.h"
-#include "node.h"
-#include <map>
-
-#include <memory>
-#include <iostream>
 
 using namespace std;
 
@@ -17,5 +17,11 @@ shared_ptr<Node> ParseCondition(istream& is);
 
 void TestParseCondition();
 
+/*
 
 
+#include "token.h"
+#include "date.h"
+#include <map>
+
+*/

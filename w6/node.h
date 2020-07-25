@@ -1,7 +1,6 @@
 #pragma once
 
 #include "date.h"
-#include "condition_parser.h"
 #include <memory>
 
 using namespace std;
@@ -23,19 +22,17 @@ enum class LogicalOperation {
 
 class Node {
 public :
-//    Node() = default;
 
     virtual bool Evaluate(const Date& date, const string& event) const = 0;
+    virtual ~Node() {};
 };
 
 class EmptyNode : public Node {
 public:
 
-    EmptyNode() = default;
-    bool Evaluate(const Date& date, const string& event) const override;
+    bool Evaluate(const Date& date, const string& event) const  override;
 
 };
-
 
 class DateComparisonNode : public Node {
 public:
@@ -60,7 +57,6 @@ private:
     Comparison CMP;
 };
 
-
 class LogicalOperationNode : public Node {
 
 public:
@@ -74,8 +70,5 @@ private:
     shared_ptr<Node> right;
 };
 
-//template <typename Compare>
-//bool template_compare(const Compare& d_1, const Compare& d_2, Comparison cmp);
-
-
-
+template <typename Compare>
+bool ComparisonTemplate(const Compare& lhs, const Compare& rhs, const Comparison& cmp);
