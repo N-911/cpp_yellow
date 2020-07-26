@@ -44,7 +44,9 @@ int Database :: RemoveIf(function<bool(const Date& date, const string& event)> c
         vector<string>& events = item.second;
 
         auto it = stable_partition(events.begin(), events.end(),
-                                   [condition, date](const string &event) { return !condition(date, event); });
+                                   [condition, date](const string &event)
+                                   { return !condition(date, event); });
+
         number += events.end() - it;
         events.erase(it, events.end());
 
@@ -59,7 +61,7 @@ int Database :: RemoveIf(function<bool(const Date& date, const string& event)> c
     return number;
 }
 
-vector<string> Database :: FindIf(function<bool(const Date& date, const string& event)> condition) const{
+vector<string> Database :: FindIf(function<bool(const Date& date, const string& event)> condition) const {
     vector<string> res;
 
     for (const auto& date : storage_v) {
@@ -72,11 +74,11 @@ vector<string> Database :: FindIf(function<bool(const Date& date, const string& 
     return res;
 }
 
-
-void Database :: Print(ostream& stream) const {
+ostream& Database :: Print(ostream& stream) const {
     for (const auto& [key, value] : storage_v) {
         for (const string& event : value) {
             stream << key << " " << event << endl;
         }
     }
+    return stream;
 }

@@ -22,7 +22,7 @@ string ParseEvent(istream& is) {
 void TestAll();
 
 int main() {
-//  TestAll();
+  TestAll();
 
   Database db;
 
@@ -39,7 +39,7 @@ int main() {
       db.Print(cout);
 
     } else if (command == "Del") {  //  удалить из базы все записи, которые удовлетворяют условию condition;
-      auto condition = ParseCondition(is);   // condition  = shared_ptr<Node>  is = "< 2017-11-06"
+      auto condition = ParseCondition(is);   // condition  = shared_ptr<Node>
       auto predicate = [condition](const Date& date, const string& event) {  // переменная содержит lambda function for compare
         return condition->Evaluate(date, event);
       };
@@ -57,7 +57,7 @@ int main() {
 
       const auto entries = db.FindIf(predicate);  // entries - контейнер пар Date-event
       for (const auto& entry : entries) {
-        cout << entry << endl;  // entry ? pair<Date, event> string "Date + event"
+        cout << entry << endl;  // vector<string> {"Date + event"}
       }
       cout << "Found " << entries.size() << " entries" << endl;
 

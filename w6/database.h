@@ -23,7 +23,7 @@ public:
 
     string Last(const Date& date) const;
 
-    void Print(ostream& stream) const;
+    ostream& Print(ostream& stream) const;
     int RemoveIf(function<bool(const Date& date, const string& event)> condition);
 
     vector<string> FindIf(function<bool(const Date& date, const string& event)>) const;

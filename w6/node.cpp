@@ -3,9 +3,7 @@
 
 using namespace std;
 
-bool EmptyNode :: Evaluate (const Date& date, const string& event) const  {
-    return true;
-}
+
 
 DateComparisonNode :: DateComparisonNode(const Comparison& _cmp, const Date& _date) {
     CMP = _cmp;
@@ -17,20 +15,25 @@ EventComparisonNode :: EventComparisonNode(const Comparison& _cmp, const string&
     EVENT = _event;
 }
 
-bool EventComparisonNode :: Evaluate(const Date& date, const string& event) const {
-    return ComparisonTemplate<string> (event, EVENT, CMP);
-}
-
-bool DateComparisonNode :: Evaluate(const Date& date, const string& event) const {
-    return ComparisonTemplate<Date> (date, DATE,  CMP);
-}
-
 LogicalOperationNode :: LogicalOperationNode(const LogicalOperation& _lop, const shared_ptr<Node>& _left,
                                              const shared_ptr<Node>& _right) {
 
     lop = _lop;
     left = _left;
     right =_right;
+}
+
+bool EmptyNode :: Evaluate (const Date& date, const string& event) const  {
+    return true;
+}
+
+
+bool DateComparisonNode :: Evaluate(const Date& date, const string& event) const {
+    return ComparisonTemplate<Date> (date, DATE,  CMP);
+}
+
+bool EventComparisonNode :: Evaluate(const Date& date, const string& event) const {
+    return ComparisonTemplate<string> (event, EVENT, CMP);
 }
 
 bool LogicalOperationNode :: Evaluate(const Date& date, const string& event) const {
@@ -57,7 +60,7 @@ bool ComparisonTemplate(const Compare& lhs, const Compare& rhs, const Comparison
     } else if (cmp == Comparison :: Equal) {
         return lhs == rhs;
     } else if (cmp == Comparison :: NotEqual) {
-        return lhs != rhs;
+        return !(lhs == rhs);
     } else {
         throw logic_error("");
     }

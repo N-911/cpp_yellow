@@ -1,6 +1,5 @@
 #include "date.h"
 
-
 using namespace std;
 
 Date :: Date() = default;
@@ -24,18 +23,19 @@ Date :: Date(int new_year, int new_month, int new_day) {
 int Date :: GetYear() const {
     return year;
 }
+
 int Date :: GetMonth() const {
     return month;
 }
+
 int Date :: GetDay() const {
     return day;
 }
 
-
 string Date_to_str(const Date& current_date) {
-    return (to_string(current_date.GetYear()) + "-" + to_string(current_date.GetMonth()) + "-" + to_string(current_date.GetDay()));
+    return (to_string(current_date.GetYear()) + "-" + to_string(current_date.GetMonth())
+            + "-" + to_string(current_date.GetDay()));
 }
-
 
 // даты будут по умолчанию выводиться в нужном формате
 ostream& operator<<(ostream& stream, const Date& date) {
@@ -54,7 +54,6 @@ bool operator<=(const Date& lhs, const Date& rhs) {
     return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} <=
            vector<int>{rhs.GetYear(), rhs.GetMonth(), rhs.GetDay()};
 }
-
 
 bool operator>(const Date& lhs, const Date& rhs) {
     return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} >
@@ -107,10 +106,6 @@ Date ParseDate(istream& is) {
         error = "Wrong date format: " + str_date;
         throw runtime_error(error);
     }
-//    if (!(is.peek() == EOF)) {
-//        error = "Wrong date format: " + str_date;
-//        throw runtime_error(error);
-//    }
     return Date(y, m, d);
 }
 
