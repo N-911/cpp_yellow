@@ -53,8 +53,8 @@ public:
     bool Evaluate(const Date& date, const string& event) const override;
 
 private:
-    string EVENT;
-    Comparison CMP;
+    const string EVENT;
+    const Comparison CMP;
 };
 
 class LogicalOperationNode : public Node {
@@ -65,10 +65,26 @@ public:
 
 
 private:
-    LogicalOperation lop;
-    shared_ptr<Node> left;
-    shared_ptr<Node> right;
+    const LogicalOperation lop;
+    const shared_ptr<Node> left;
+    const shared_ptr<Node> right;
 };
 
 template <typename Compare>
-bool ComparisonTemplate(const Compare& lhs, const Compare& rhs, const Comparison& cmp);
+bool ComparisonTemplate(const Compare& lhs, const Compare& rhs, const Comparison& cmp) {
+    if (cmp == Comparison :: Less) {
+        return lhs < rhs;
+    } else if (cmp == Comparison :: LessOrEqual) {
+        return lhs <= rhs;
+    } else if (cmp == Comparison ::Greater) {
+        return lhs > rhs;
+    } else if (cmp == Comparison :: GreaterOrEqual) {
+        return lhs >= rhs;
+    } else if (cmp == Comparison :: Equal) {
+        return lhs == rhs;
+    } else if (cmp == Comparison :: NotEqual) {
+        return !(lhs == rhs);
+    } else {
+        throw logic_error("");
+    }
+}

@@ -1,5 +1,13 @@
 #include "database.h"
 
+/*
+auto predicate = [condition](const Date& date, const string& event) {
+                 return condition->Evaluate(date, event);
+*/
+
+bool pred(BidirIt first, const Date &date2, function<bool(const Date& date, const string& event)> predicate) {
+    return predicate(date2, first);
+}
 
 void Database :: Add(const Date& date, const string& event) {
 //    if (storage_s.count(date) != 0 && (storage_s[date].count(event) == 0)) {
@@ -11,32 +19,86 @@ void Database :: Add(const Date& date, const string& event) {
 
 string Database:: Last(const Date& date) const {
     if (storage_v.empty() || date < storage_v.begin()->first)
-        throw invalid_argument("");
+        throw invalid_argument("no date");
 
     auto up = storage_v.upper_bound(date);
     --up;
     return (Date_to_str((*up).first) + " " + *up->second.rbegin());
 }
-    /*
-    auto it = storage_v.upper_bound(date);
 
-    if (it != storage_v.begin()) {
+int Database :: RemoveIf(function<bool(const Date& date, const string& event)> predicate) {
+        map<Date, vector<string>> storage_v_copy = storage_v;
 
-//    if (it != storage_v.end()) {
-//        cout << "=====" << it->first << " upper_bound(date)" << endl;
-//        cout << "=====" << it->second.back() << " upper_bound(event)" << endl;
-//    }
-        cout << (--it)->first << " ";
-        return *(--it)->second.rbegin();
-    }
-    else {
-        throw invalid_argument("no date");
-    }
+        for (auto item : storage_v_copy) {
+            Date date = item.first;
+            vector<string> &events = item.second;
+            auto it = stable_partition(storage_v_copy.begin(), storage_v_copy.end(), pred(*first, date, predicate));
+//                           [predicate] (const Date& date, const string& event) { return predicate(date, event);} );
+        }
+        return 0;
 }
-*/
 
-int Database :: RemoveIf(function<bool(const Date& date, const string& event)> condition) {
-    int number = 0;
+vector<string> Database :: FindIf(function<bool(const Date& date, const string& event)> predicate) const {
+    vector<string> res;
+    map<Date, vector<string>> storage_v_copy = storage_v;
+
+
+    for (const auto& date : storage_v) {
+        for (const auto& ev : date.second) {
+            if (predicate(date.first, ev)) {
+                res.push_back(Date_to_str(date.first) + " " + ev);
+            }
+        }
+    }
+    return res;
+}
+
+ostream& Database :: Print(ostream& stream) const {
+    for (const auto& [key, value] : storage_v) {
+        for (const string& event : value) {
+            stream << key << " " << event << endl;
+        }
+    }
+    return stream;
+}
+
+
+
+
+/*
+ *     for (const auto& [key, value] : storage_v) {
+        for (const string& event : value) {
+            stream << key << " " << event << endl;
+        }
+    }
+
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ *     int number = 0;
         map<Date, vector<string>> storage_v_copy = storage_v;
 
     for (auto item : storage_v_copy) {
@@ -59,26 +121,7 @@ int Database :: RemoveIf(function<bool(const Date& date, const string& event)> c
         }
     }
     return number;
-}
 
-vector<string> Database :: FindIf(function<bool(const Date& date, const string& event)> condition) const {
-    vector<string> res;
 
-    for (const auto& date : storage_v) {
-        for (const auto& ev : date.second) {
-            if (condition(date.first, ev)) {
-                res.push_back(Date_to_str(date.first) + " " + ev);
-            }
-        }
-    }
-    return res;
-}
 
-ostream& Database :: Print(ostream& stream) const {
-    for (const auto& [key, value] : storage_v) {
-        for (const string& event : value) {
-            stream << key << " " << event << endl;
-        }
-    }
-    return stream;
-}
+ */
