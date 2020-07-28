@@ -19,14 +19,14 @@ class AlwaysFalseNode : public Node {
 
 string ParseEvent(istream& is);
 
-int DoRemove (Database& db, const string& str) {
-    istringstream is (str);
-    auto condition = ParseCondition(is);
-    auto predicate = [condition](const Date &date, const string &event) {
-        return condition->Evaluate(date, event);
-    };
-    return db.RemoveIf(predicate);
-}
+//int DoRemove (Database& db, const string& str) {
+//    istringstream is (str);
+//    auto condition = ParseCondition(is);
+//    auto predicate = [condition](const Date &date, const string &event) {
+//        return condition->Evaluate(date, event);
+//    };
+//    return db.RemoveIf(predicate);
+//}
 
 string DoFind (Database& db, const string& str) {
     istringstream is (str);
@@ -40,7 +40,7 @@ string DoFind (Database& db, const string& str) {
     for (const auto& entry : entries) {
         os << entry << '\n';  // vector<string> {"Date + event"}
     }
-    cout << "Found " << entries.size() << " entries" << endl;
+    os << "Found " << entries.size() << " entries";
     return os.str();
 }
 
@@ -86,20 +86,20 @@ void TestDbFind() {
         Database db;
         db.Add({2017, 1, 1}, "new year");
         db.Add({2017, 1, 7}, "xmas");
-        AssertEqual("2017-01-01 new year\n1", DoFind(db, "date == 2017-01-01"), "simple find by date");
-        AssertEqual("2017-01-01 new year\n2017-01-07 xmas\n2", DoFind(db, "date < 2017-01-31"), "multiple find by date");
-        AssertEqual("2017-01-01 new year\n1", DoFind(db, R"(event != "xmas")"), "multiple find by holiday");
+        AssertEqual("2017-01-01 new year\nFound 1 entries", DoFind(db, "date == 2017-01-01"), "simple find by date");
+        AssertEqual("2017-01-01 new year\n2017-01-07 xmas\nFound 2 entries", DoFind(db, "date < 2017-01-31"), "multiple find by date");
+        AssertEqual("2017-01-01 new year\nFound 1 entries", DoFind(db, R"(event != "xmas")"), "multiple find by holiday");
     }
     {
         Database db;
         db.Add({2017, 1, 1}, "new year");
         db.Add({2017, 1, 1}, "new year2");
         db.Add({2017, 1, 7}, "xmas");
-        AssertEqual("2017-01-01 new year\n2017-01-07 xmas\n2", DoFind(db, R"(date == 2017-01-07 OR event == "new year")"),
+        AssertEqual("2017-01-01 new year\n2017-01-07 xmas\nFound 2 entries", DoFind(db, R"(date == 2017-01-07 OR event == "new year")"),
                     "complex find or");
-        AssertEqual("2017-01-01 new year\n1", DoFind(db, R"(date == 2017-01-01 AND event == "new year")"),
+        AssertEqual("2017-01-01 new year\nFound 1 entries", DoFind(db, R"(date == 2017-01-01 AND event == "new year")"),
                     "complex find and");
-        AssertEqual("0", DoFind(db, R"(date == 2017-01-09 AND event == "new year")"),
+        AssertEqual("Found 0 entries", DoFind(db, R"(date == 2017-01-09 AND event == "new year")"),
                     "complex find and, nothing");
     }
     {
@@ -107,10 +107,10 @@ void TestDbFind() {
         db.Add({2017, 1, 1}, "new year");
         db.Add({2017, 1, 1}, "Holiday");
         db.Add({2017, 1, 7}, "xmas");
-        AssertEqual("2017-01-07 xmas\n1", DoFind(db, "date == 2017-01-07"), "single find by date");
-        AssertEqual("2017-01-01 new year\n2017-01-01 Holiday\n2017-01-07 xmas\n3", DoFind(db, "date < 2017-01-31"), "multiple find by date");
-        AssertEqual("2017-01-01 new year\n2017-01-01 Holiday\n2", DoFind(db, R"(event != "xmas")"), "multiple find by event != xmas ");
-        AssertEqual("2017-01-01 Holiday\n2017-01-07 xmas\n2", DoFind(db, R"(event != "new year")"), "multiple find by event != new year");
+        AssertEqual("2017-01-07 xmas\nFound 1 entries", DoFind(db, "date == 2017-01-07"), "single find by date");
+        AssertEqual("2017-01-01 new year\n2017-01-01 Holiday\n2017-01-07 xmas\nFound 3 entries", DoFind(db, "date < 2017-01-31"), "multiple find by date");
+        AssertEqual("2017-01-01 new year\n2017-01-01 Holiday\nFound 2 entries", DoFind(db, R"(event != "xmas")"), "multiple find by event != xmas ");
+        AssertEqual("2017-01-01 Holiday\n2017-01-07 xmas\nFound 2 entries", DoFind(db, R"(event != "new year")"), "multiple find by event != new year");
     }
 
 }
@@ -144,7 +144,7 @@ void TestDbLast(){
         AssertEqual("2017-01-07 xmas", os.str(), "greater than max date");
     }
 }
-
+/*
 void TestDbRemoveIf () {
     {
         Database db;
@@ -177,6 +177,9 @@ void TestDbRemoveIf () {
     }
 }
 
+ */
+
+
 void TestInsertionOrder()
 {
     {
@@ -191,6 +194,126 @@ void TestInsertionOrder()
     }
 
 }
+
+void TestDateComparisonNode() {
+    {
+        DateComparisonNode dcn(Comparison::Equal, {2017, 11, 18});
+        Assert(dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 1");
+        Assert(!dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 2");
+    }
+    {
+        DateComparisonNode dcn(Comparison::NotEqual, {2017, 11, 18});
+        Assert(dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 3");
+        Assert(!dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 4");
+    }
+    {
+        DateComparisonNode dcn(Comparison::Less, {2017, 11, 18});
+        Assert(dcn.Evaluate(Date{2017, 11, 17}, ""), "DateComparison 5");
+        Assert(!dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 6");
+        Assert(!dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 7");
+    }
+    {
+        DateComparisonNode dcn(Comparison::Greater, {2017, 11, 18});
+        Assert(dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 8");
+        Assert(!dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 9");
+        Assert(!dcn.Evaluate(Date{2017, 11, 17}, ""), "DateComparison 10");
+    }
+    {
+        DateComparisonNode dcn(Comparison::LessOrEqual, {2017, 11, 18});
+        Assert(dcn.Evaluate(Date{2017, 11, 17}, ""), "DateComparison 11");
+        Assert(dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 12");
+        Assert(!dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 13");
+    }
+    {
+        DateComparisonNode dcn(Comparison::GreaterOrEqual, {2017, 11, 18});
+        Assert(dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 14");
+        Assert(dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 15");
+        Assert(!dcn.Evaluate(Date{2017, 11, 17}, ""), "DateComparison 16");
+    }
+}
+
+void TestEventComparisonNode() {
+    {
+        EventComparisonNode ecn(Comparison::Equal, "abc");
+        Assert(ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 1");
+        Assert(!ecn.Evaluate(Date{0, 1, 1}, "cbe"), "EventComparison 2");
+    }
+    {
+        EventComparisonNode ecn(Comparison::NotEqual, "abc");
+        Assert(ecn.Evaluate(Date{0, 1, 1}, "cde"), "EventComparison 3");
+        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 4");
+    }
+    {
+        EventComparisonNode ecn(Comparison::Less, "abc");
+        Assert(ecn.Evaluate(Date{0, 1, 1}, "abb"), "EventComparison 5");
+        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 6");
+        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abd"), "EventComparison 7");
+    }
+    {
+        EventComparisonNode ecn(Comparison::Greater, "abc");
+        Assert(ecn.Evaluate(Date{0, 1, 1}, "abd"), "EventComparison 8");
+        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 9");
+        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abb"), "EventComparison 10");
+    }
+    {
+        EventComparisonNode ecn(Comparison::LessOrEqual, "abc");
+        Assert(ecn.Evaluate(Date{0, 1, 1}, "abb"), "EventComparison 11");
+        Assert(ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 12");
+        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abd"), "EventComparison 13");
+    }
+    {
+        EventComparisonNode ecn(Comparison::GreaterOrEqual, "abc");
+        Assert(ecn.Evaluate(Date{0, 1, 1}, "abd"), "EventComparison 14");
+        Assert(ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 15");
+        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abb"), "EventComparison 16");
+    }
+}
+
+void TestLogicalOperationNode() {
+    {
+        LogicalOperationNode lon(LogicalOperation::And, make_shared<EmptyNode>(), make_shared<EmptyNode>());
+        Assert(lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 1");
+    }
+    {
+        LogicalOperationNode lon(LogicalOperation::And, make_shared<AlwaysFalseNode>(), make_shared<EmptyNode>());
+        Assert(!lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 2");
+    }
+    {
+        LogicalOperationNode lon(LogicalOperation::And, make_shared<EmptyNode>(), make_shared<AlwaysFalseNode>());
+        Assert(!lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 3");
+    }
+    {
+        LogicalOperationNode lon(LogicalOperation::And, make_shared<AlwaysFalseNode>(), make_shared<AlwaysFalseNode>());
+        Assert(!lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 4");
+    }
+    {
+        LogicalOperationNode lon(LogicalOperation::Or, make_shared<EmptyNode>(), make_shared<EmptyNode>());
+        Assert(lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 5");
+    }
+    {
+        LogicalOperationNode lon(LogicalOperation::Or, make_shared<AlwaysFalseNode>(), make_shared<EmptyNode>());
+        Assert(lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 6");
+    }
+    {
+        LogicalOperationNode lon(LogicalOperation::Or, make_shared<EmptyNode>(), make_shared<AlwaysFalseNode>());
+        Assert(lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 7");
+    }
+    {
+        LogicalOperationNode lon(LogicalOperation::Or, make_shared<AlwaysFalseNode>(), make_shared<AlwaysFalseNode>());
+        Assert(!lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 8");
+    }
+}
+
+void TestEmptyNode() {
+    {
+        EmptyNode en;
+        Assert(en.Evaluate(Date{0, 1, 1}, "abc"), "EmptyNode 1");
+        Assert(en.Evaluate(Date{2017, 11, 18}, "def"), "EmptyNode 2");
+        Assert(en.Evaluate(Date{9999, 12, 31}, "ghi"), "EmptyNode 3");
+    }
+}
+
+
 
 /*
 void TestsMyCustom()
@@ -574,120 +697,5 @@ void TestDatabase() {
 }
 
  */
-void TestDateComparisonNode() {
-    {
-        DateComparisonNode dcn(Comparison::Equal, {2017, 11, 18});
-        Assert(dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 1");
-        Assert(!dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 2");
-    }
-    {
-        DateComparisonNode dcn(Comparison::NotEqual, {2017, 11, 18});
-        Assert(dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 3");
-        Assert(!dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 4");
-    }
-    {
-        DateComparisonNode dcn(Comparison::Less, {2017, 11, 18});
-        Assert(dcn.Evaluate(Date{2017, 11, 17}, ""), "DateComparison 5");
-        Assert(!dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 6");
-        Assert(!dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 7");
-    }
-    {
-        DateComparisonNode dcn(Comparison::Greater, {2017, 11, 18});
-        Assert(dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 8");
-        Assert(!dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 9");
-        Assert(!dcn.Evaluate(Date{2017, 11, 17}, ""), "DateComparison 10");
-    }
-    {
-        DateComparisonNode dcn(Comparison::LessOrEqual, {2017, 11, 18});
-        Assert(dcn.Evaluate(Date{2017, 11, 17}, ""), "DateComparison 11");
-        Assert(dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 12");
-        Assert(!dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 13");
-    }
-    {
-        DateComparisonNode dcn(Comparison::GreaterOrEqual, {2017, 11, 18});
-        Assert(dcn.Evaluate(Date{2017, 11, 19}, ""), "DateComparison 14");
-        Assert(dcn.Evaluate(Date{2017, 11, 18}, ""), "DateComparison 15");
-        Assert(!dcn.Evaluate(Date{2017, 11, 17}, ""), "DateComparison 16");
-    }
-}
 
-void TestEventComparisonNode() {
-    {
-        EventComparisonNode ecn(Comparison::Equal, "abc");
-        Assert(ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 1");
-        Assert(!ecn.Evaluate(Date{0, 1, 1}, "cbe"), "EventComparison 2");
-    }
-    {
-        EventComparisonNode ecn(Comparison::NotEqual, "abc");
-        Assert(ecn.Evaluate(Date{0, 1, 1}, "cde"), "EventComparison 3");
-        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 4");
-    }
-    {
-        EventComparisonNode ecn(Comparison::Less, "abc");
-        Assert(ecn.Evaluate(Date{0, 1, 1}, "abb"), "EventComparison 5");
-        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 6");
-        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abd"), "EventComparison 7");
-    }
-    {
-        EventComparisonNode ecn(Comparison::Greater, "abc");
-        Assert(ecn.Evaluate(Date{0, 1, 1}, "abd"), "EventComparison 8");
-        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 9");
-        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abb"), "EventComparison 10");
-    }
-    {
-        EventComparisonNode ecn(Comparison::LessOrEqual, "abc");
-        Assert(ecn.Evaluate(Date{0, 1, 1}, "abb"), "EventComparison 11");
-        Assert(ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 12");
-        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abd"), "EventComparison 13");
-    }
-    {
-        EventComparisonNode ecn(Comparison::GreaterOrEqual, "abc");
-        Assert(ecn.Evaluate(Date{0, 1, 1}, "abd"), "EventComparison 14");
-        Assert(ecn.Evaluate(Date{0, 1, 1}, "abc"), "EventComparison 15");
-        Assert(!ecn.Evaluate(Date{0, 1, 1}, "abb"), "EventComparison 16");
-    }
-}
 
-void TestLogicalOperationNode() {
-    {
-        LogicalOperationNode lon(LogicalOperation::And, make_shared<EmptyNode>(), make_shared<EmptyNode>());
-        Assert(lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 1");
-    }
-    {
-        LogicalOperationNode lon(LogicalOperation::And, make_shared<AlwaysFalseNode>(), make_shared<EmptyNode>());
-        Assert(!lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 2");
-    }
-    {
-        LogicalOperationNode lon(LogicalOperation::And, make_shared<EmptyNode>(), make_shared<AlwaysFalseNode>());
-        Assert(!lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 3");
-    }
-    {
-        LogicalOperationNode lon(LogicalOperation::And, make_shared<AlwaysFalseNode>(), make_shared<AlwaysFalseNode>());
-        Assert(!lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 4");
-    }
-    {
-        LogicalOperationNode lon(LogicalOperation::Or, make_shared<EmptyNode>(), make_shared<EmptyNode>());
-        Assert(lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 5");
-    }
-    {
-        LogicalOperationNode lon(LogicalOperation::Or, make_shared<AlwaysFalseNode>(), make_shared<EmptyNode>());
-        Assert(lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 6");
-    }
-    {
-        LogicalOperationNode lon(LogicalOperation::Or, make_shared<EmptyNode>(), make_shared<AlwaysFalseNode>());
-        Assert(lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 7");
-    }
-    {
-        LogicalOperationNode lon(LogicalOperation::Or, make_shared<AlwaysFalseNode>(), make_shared<AlwaysFalseNode>());
-        Assert(!lon.Evaluate(Date{0, 1, 1}, "abc"), "LogicalOperationNode 8");
-    }
-}
-
-void TestEmptyNode() {
-    {
-        EmptyNode en;
-        Assert(en.Evaluate(Date{0, 1, 1}, "abc"), "EmptyNode 1");
-        Assert(en.Evaluate(Date{2017, 11, 18}, "def"), "EmptyNode 2");
-        Assert(en.Evaluate(Date{9999, 12, 31}, "ghi"), "EmptyNode 3");
-    }
-}

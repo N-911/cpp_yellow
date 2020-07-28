@@ -34,11 +34,8 @@ int Date :: GetDay() const {
 
 string Date_to_str(const Date& current_date) {
     ostringstream os;
-        os << current_date << '\n';  // vector<string> {"Date + event"}
+        os << current_date;  // vector<string> {"Date + event"}
     return os.str();
-
-//    return (to_string(current_date.GetYear()) + "-" + to_string(current_date.GetMonth())
-//            + "-" + to_string(current_date.GetDay()));
 }
 
 // даты будут по умолчанию выводиться в нужном формате

@@ -102,7 +102,9 @@ void TestAll() {
   TestRunner tr;
   tr.RunTest(TestParseEvent, "TestParseEvent");
   tr.RunTest(TestParseCondition, "TestParseCondition");
-  //-----
+
+//*******************************************************************************
+//  tests
 //    tr.RunTest(TestEmptyNode, "Тест 2 из Coursera");
 //    tr.RunTest(TestDbAdd, "Тест 3(1) из Coursera");
 //    tr.RunTest(TestDbFind, "Тест 3(2) из Coursera");
@@ -114,5 +116,6 @@ void TestAll() {
 //    tr.RunTest(TestDateComparisonNode, "Тест TestDateComparisonNode");
 //    tr.RunTest(TestsMyCustom, "Мои тесты");
 //    tr.RunTest(TestDatabase, "Тест базы данных с GitHub");
+ //*******************************************************************************
 
 }

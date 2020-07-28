@@ -15,22 +15,6 @@
 
 using namespace std;
 
-struct Entry{
-    Date date;
-    std::string event;
-};
-
-std::ostream& operator<<(std::ostream&, const Entry&);
-std::ostream& operator<<(std::ostream&, const std::vector<Entry>&);
-std::ostream& operator<<(std::ostream&, const std::vector<std::string>&);
-
-bool operator<(const Entry&, const Entry&);
-bool operator>(const Entry&, const Entry&);
-bool operator==(const Entry&, const Entry&);
-bool operator!=(const Entry&, const Entry&);
-bool operator==(const Entry&, const std::string&);
-bool operator!=(const Entry&, const std::string&);
-
 
 class Database {
 public:
@@ -43,9 +27,39 @@ public:
     ostream& Print(ostream& stream) const;
     int RemoveIf(function<bool(const Date& date, const string& event)> predicate);
 
+//    template <typename Predicate>
+//    int RemoveIf(Predicate predicate) {
+//        map<Date, vector<string>> storage_v_copy = storage_v;
+//        int number = 0;
+//
+//        for (auto item : storage_v_copy) {
+//            Date date = item.first;
+//            vector<string> &events = item.second;
+//
+//            auto it = stable_partition(events.begin(), events.end(), predicate);
+//
+//            number += events.end() - it;
+//            events.erase(it, events.end());
+//
+//            if (events.size() == 0) {
+//                storage_v.erase(item.first);
+//                storage_s.erase(item.first);
+//            } else {
+//                storage_v[date] = events;
+//                storage_s[date] = set<string>(events.begin(), events.end());
+//            }
+//        }
+//        return number;
+//    }
+
     vector<string> FindIf(function<bool(const Date& date, const string& event)>predicate) const;
 
 private:
     map<Date, vector<string>> storage_v;
     map<Date, set<string>> storage_s;
 };
+
+
+
+
+
