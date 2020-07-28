@@ -33,8 +33,12 @@ int Date :: GetDay() const {
 }
 
 string Date_to_str(const Date& current_date) {
-    return (to_string(current_date.GetYear()) + "-" + to_string(current_date.GetMonth())
-            + "-" + to_string(current_date.GetDay()));
+    ostringstream os;
+        os << current_date << '\n';  // vector<string> {"Date + event"}
+    return os.str();
+
+//    return (to_string(current_date.GetYear()) + "-" + to_string(current_date.GetMonth())
+//            + "-" + to_string(current_date.GetDay()));
 }
 
 // даты будут по умолчанию выводиться в нужном формате
@@ -44,6 +48,8 @@ ostream& operator<<(ostream& stream, const Date& date) {
            "-" << setw(2) << setfill('0') << date.GetDay();
     return stream;
 }
+
+
 
 bool operator<(const Date& lhs, const Date& rhs) {
     return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} <

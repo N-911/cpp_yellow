@@ -1,13 +1,77 @@
 #include "database.h"
 
+std::ostream &operator<<(std::ostream &os, const Entry &e)
+{
+    os << e.date << ' ' << e.event;
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const std::vector<Entry> &v)
+{
+    for(const Entry e : v)
+        os <<  e << std::endl;
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const std::vector<std::string> &events)
+{
+    for (const std::string& ev : events){
+        os << ev << " ";
+    }
+    return os;
+}
+
+bool operator<(const Entry &left, const Entry &right)
+{
+    if(left.date == right.date)
+        return left.event < right.event;
+    else
+        return left.date < right.date;
+}
+
+bool operator>(const Entry &left, const Entry &right)
+{
+    if(left.date == right.date)
+        return left.event > right.event;
+    else
+        return left.date > right.date;
+}
+
+bool operator==(const Entry &e, const std::string &str)
+{
+    std::stringstream ss;
+    ss << e.date << ' ' << e.event;
+    return (str == e.event || str == ss.str());
+}
+
+bool operator!=(const Entry &e, const std::string &str)
+{
+    std::stringstream ss;
+    ss << e.date << ' ' << e.event;
+    return (str != e.event && str != ss.str());
+}
+
+bool operator==(const Entry& left, const Entry& right)
+{
+    return (left.date == right.date) && (left.event == right.event);
+}
+
+bool operator!=(const Entry& left, const Entry& right)
+{
+    return left.date != right.date || left.event != right.event;
+}
+
+//*********************************************************************
+
+
 /*
 auto predicate = [condition](const Date& date, const string& event) {
                  return condition->Evaluate(date, event);
 */
 
-bool pred(BidirIt first, const Date &date2, function<bool(const Date& date, const string& event)> predicate) {
-    return predicate(date2, first);
-}
+//bool pred(BidirIt first, const Date &date2, function<bool(const Date& date, const string& event)> predicate) {
+//    return predicate(date2, first);
+//}
 
 void Database :: Add(const Date& date, const string& event) {
 //    if (storage_s.count(date) != 0 && (storage_s[date].count(event) == 0)) {
@@ -27,21 +91,33 @@ string Database:: Last(const Date& date) const {
 }
 
 int Database :: RemoveIf(function<bool(const Date& date, const string& event)> predicate) {
-        map<Date, vector<string>> storage_v_copy = storage_v;
+    map<Date, vector<string>> storage_v_copy = storage_v;
+    int number = 0;
 
-        for (auto item : storage_v_copy) {
-            Date date = item.first;
-            vector<string> &events = item.second;
-            auto it = stable_partition(storage_v_copy.begin(), storage_v_copy.end(), pred(*first, date, predicate));
-//                           [predicate] (const Date& date, const string& event) { return predicate(date, event);} );
+    for (auto item : storage_v_copy) {
+        Date date = item.first;
+        vector<string> &events = item.second;
+
+        auto it = stable_partition(events.begin(), events.end(),
+                                   [predicate, date](const string &event) { return !predicate(date, event); });
+
+        number += events.end() - it;
+        events.erase(it, events.end());
+
+        if (events.size() == 0) {
+            storage_v.erase(item.first);
+            storage_s.erase(item.first);
+        } else {
+            storage_v[date] = events;
+            storage_s[date] = set<string>(events.begin(), events.end());
         }
-        return 0;
+    }
+    return number;
 }
 
 vector<string> Database :: FindIf(function<bool(const Date& date, const string& event)> predicate) const {
     vector<string> res;
     map<Date, vector<string>> storage_v_copy = storage_v;
-
 
     for (const auto& date : storage_v) {
         for (const auto& ev : date.second) {

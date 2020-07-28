@@ -7,6 +7,7 @@
 #include "condition_parser.h"
 #include "node.h"
 #include "test_runner.h"
+#include "test_db.h"
 
 
 using namespace std;
@@ -57,7 +58,7 @@ int main() {
 
       const auto entries = db.FindIf(predicate);  // entries - контейнер пар Date-event
       for (const auto& entry : entries) {
-        cout << entry << endl;  // vector<string> {"Date + event"}
+        cout << entry << '\n';  // vector<string> {"Date + event"}
       }
       cout << "Found " << entries.size() << " entries" << endl;
 
@@ -77,7 +78,6 @@ int main() {
   return 0;
 }
 
-
 void TestParseEvent() {
   {
     istringstream is("event");
@@ -96,8 +96,23 @@ void TestParseEvent() {
   }
 }
 
+
+
 void TestAll() {
   TestRunner tr;
   tr.RunTest(TestParseEvent, "TestParseEvent");
   tr.RunTest(TestParseCondition, "TestParseCondition");
+  //-----
+//    tr.RunTest(TestEmptyNode, "Тест 2 из Coursera");
+//    tr.RunTest(TestDbAdd, "Тест 3(1) из Coursera");
+//    tr.RunTest(TestDbFind, "Тест 3(2) из Coursera");
+//    tr.RunTest(TestDbLast, "Тест 3(3) из Coursera");
+//    tr.RunTest(TestDbRemoveIf, "Тест 3(4) из Coursera");
+//    tr.RunTest(TestInsertionOrder, "Тест на порядок вывода");
+//    tr.RunTest(TestLogicalOperationNode, "Тест TestLogicalOperationNode");
+//    tr.RunTest(TestEventComparisonNode, "Тест TestEventComparisonNode");
+//    tr.RunTest(TestDateComparisonNode, "Тест TestDateComparisonNode");
+//    tr.RunTest(TestsMyCustom, "Мои тесты");
+//    tr.RunTest(TestDatabase, "Тест базы данных с GitHub");
+
 }
